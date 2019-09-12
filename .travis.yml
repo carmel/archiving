@@ -1,0 +1,14 @@
+language: go
+
+go:
+  - 1.9.x
+  - 1.10.3
+
+go_import_path: github.com/carmel/archiving
+
+install:
+  - go build -v
+  - ./archiving -f -src=./example/public -dest=./example/
+
+script:
+  - go test -v -bench=. ./...
