@@ -37,10 +37,10 @@ var zipData string
 type file struct {
 	os.FileInfo
 	data []byte
-	fs   *statikFS
+	fs   *archivingFS
 }
 
-type statikFS struct {
+type archivingFS struct {
 	files map[string]file
 	dirs  map[string][]string
 }
@@ -63,7 +63,7 @@ func New() (http.FileSystem, error) {
 	}
 	files := make(map[string]file, len(zipReader.File))
 	dirs := make(map[string][]string)
-	fs := &statikFS{files: files, dirs: dirs}
+	fs := &archivingFS{files: files, dirs: dirs}
 	for _, zipFile := range zipReader.File {
 		fi := zipFile.FileInfo()
 		f := file{FileInfo: fi, fs: fs}
@@ -123,7 +123,7 @@ func unzip(zf *zip.File) ([]byte, error) {
 // no file matching the given file name is found in the archiving.
 // If a directory is requested, Open returns the file named "index.html"
 // in the requested directory, if that file exists.
-func (fs *statikFS) Open(name string) (http.File, error) {
+func (fs *archivingFS) Open(name string) (http.File, error) {
 	name = filepath.Clean(name)
 	if f, ok := fs.files[name]; ok {
 		return newHTTPFile(f), nil
